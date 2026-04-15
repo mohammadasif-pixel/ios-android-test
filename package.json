@@ -1,0 +1,25 @@
+{
+  "name": "cordova-plugin-installed-apps",
+  "version": "1.0.0",
+  "description": "Applist Plugin (Android + iOS)",
+  "cordova": {
+    "id": "cordova-plugin-installed-apps",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios"
+  ],
+  "author": "Applist",
+  "license": "MIT",
+  "files": [
+    "src",
+    "www",
+    "plugin.xml",
+    "package.json"
+  ]
+}

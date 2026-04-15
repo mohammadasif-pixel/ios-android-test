@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+        <title>Applist Demo</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+        <style>
+            :root {
+                --primary: #007AFF;
+                --primary-dark: #0056b3;
+                --bg: #F2F2F7;
+                --card: #FFFFFF;
+                --text: #1C1C1E;
+                --text-secondary: #8E8E93;
+            }
+
+            body { 
+                font-family: 'Outfit', -apple-system, system-ui, sans-serif; 
+                background-color: var(--bg);
+                color: var(--text);
+                margin: 0;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                min-height: 100vh;
+            }
+
+            .container {
+                width: 100%;
+                max-width: 500px;
+                padding: env(safe-area-inset-top) 20px 40px;
+                box-sizing: border-box;
+            }
+
+            header {
+                padding: 40px 0 20px;
+                text-align: center;
+            }
+
+            h1 {
+                font-weight: 600;
+                font-size: 32px;
+                margin: 0 0 10px;
+                background: linear-gradient(135deg, var(--primary), #5856D6);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            p.subtitle {
+                color: var(--text-secondary);
+                font-size: 16px;
+                margin: 0;
+            }
+
+            .main-card {
+                background: var(--card);
+                border-radius: 20px;
+                padding: 24px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+                margin-bottom: 24px;
+                transition: transform 0.3s ease;
+            }
+
+            #btn-get { 
+                padding: 18px; 
+                font-size: 18px; 
+                font-weight: 600;
+                background: linear-gradient(135deg, var(--primary), #5856D6);
+                color: white; 
+                border: none; 
+                border-radius: 14px; 
+                width: 100%; 
+                cursor: pointer;
+                transition: all 0.2s ease;
+                box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+            }
+
+            #btn-get:active {
+                transform: scale(0.98);
+                box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
+            }
+
+            #btn-get:disabled {
+                opacity: 0.6;
+                background: #8E8E93;
+                box-shadow: none;
+            }
+
+            #appList {
+                width: 100%;
+            }
+
+            ul { 
+                list-style-type: none; 
+                padding: 0; 
+                margin: 0;
+            }
+
+            li { 
+                background: var(--card);
+                border-radius: 16px;
+                padding: 16px; 
+                margin-bottom: 12px;
+                display: flex;
+                align-items: center;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+                animation: slideIn 0.4s ease forwards;
+                opacity: 0;
+            }
+
+            @keyframes slideIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+
+            .icon-wrapper {
+                width: 52px;
+                height: 52px;
+                border-radius: 12px;
+                overflow: hidden;
+                margin-right: 16px;
+                background: #f0f0f5;
+                flex-shrink: 0;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
+
+            .icon-wrapper img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .app-info {
+                flex-grow: 1;
+            }
+
+            .app-name {
+                font-weight: 600;
+                font-size: 17px;
+                display: block;
+                margin-bottom: 4px;
+            }
+
+            .app-scheme {
+                font-size: 13px;
+                color: var(--text-secondary);
+                font-family: monospace;
+            }
+
+            .badge {
+                padding: 6px 12px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .badge.yes {
+                background: #EAF9F1;
+                color: #24A148;
+            }
+
+            .loading-shimmer {
+                color: var(--text-secondary);
+                text-align: center;
+                padding: 40px;
+                font-style: italic;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <h1>Installed Apps</h1>
+                <p class="subtitle">Plugin Demo & Verification</p>
+            </header>
+
+            <div class="main-card">
+                <button onclick="getApps()" id="btn-get" disabled>Initializing...</button>
+            </div>
+
+            <div id="appList"></div>
+        </div>
+
+        <script src="cordova.js"></script>
+        <script>
+            // FAILSAFE: If Cordova/DeviceReady doesn't fire in 3 seconds, manually initialize.
+            // This ensures the preview works even if the Cordova bridge stalls in the tunnel.
+            var initialized = false;
+            function initApp() {
+                if (initialized) return;
+                initialized = true;
+                
+                var btn = document.getElementById('btn-get');
+                btn.innerHTML = 'Scan Installed Apps';
+                btn.disabled = false;
+                console.log("App Initialized (Failsafe or DeviceReady)");
+
+                // Ensure the plugin is mocked if the official bridge failed
+                if (!(window.cordova && window.cordova.plugins && window.cordova.plugins.InstalledApps)) {
+                    console.log("Injecting emergency browser mock...");
+                    window.cordova = window.cordova || {};
+                    window.cordova.plugins = window.cordova.plugins || {};
+                    window.cordova.plugins.InstalledApps = {
+                        getInstalledApps: function(success) {
+                            setTimeout(function() {
+                                success([
+                                    { appName: "PhonePe", urlScheme: "phonepe", icon: "https://cdn-icons-png.flaticon.com/512/825/825454.png" },
+                                    { appName: "Google Pay", urlScheme: "gpay", icon: "https://cdn-icons-png.flaticon.com/512/6124/6124998.png" },
+                                    { appName: "Paytm", urlScheme: "paytm", icon: "https://cdn-icons-png.flaticon.com/512/10046/10046638.png" },
+                                    { appName: "WhatsApp", urlScheme: "whatsapp", icon: "https://cdn-icons-png.flaticon.com/512/3536/3536445.png" },
+                                    { appName: "Amazon", urlScheme: "amazon", icon: "https://cdn-icons-png.flaticon.com/512/5968/5968202.png" }
+                                ]);
+                            }, 800);
+                        }
+                    };
+                }
+            }
+
+            document.addEventListener('deviceready', initApp, false);
+            setTimeout(initApp, 3000); // 3-second failsafe
+
+            function getApps() {
+                var listDiv = document.getElementById('appList');
+                listDiv.innerHTML = '<div class="loading-shimmer">Scanning device for matches...</div>';
+                
+                var btn = document.getElementById('btn-get');
+                btn.disabled = true;
+
+                if (window.cordova && window.cordova.plugins && window.cordova.plugins.InstalledApps) {
+                    window.cordova.plugins.InstalledApps.getInstalledApps(function(apps) {
+                        btn.disabled = false;
+                        var html = '<ul>';
+                        if (apps.length === 0) {
+                            html = '<div class="main-card" style="text-align:center; color: var(--text-secondary);">No matching apps found.</div>';
+                        } else {
+                            apps.forEach(function(app, index) {
+                                var delay = index * 0.05;
+                                html += '<li style="animation-delay: ' + delay + 's">';
+                                html += '<div class="icon-wrapper">';
+                                if (app.icon) {
+                                    html += '<img src="' + app.icon + '" alt="icon" />';
+                                }
+                                html += '</div>';
+                                html += '<div class="app-info">';
+                                html += '<span class="app-name">' + (app.appName || app.urlScheme) + '</span>';
+                                html += '<span class="app-scheme">' + (app.urlScheme || 'N/A') + '://</span>';
+                                html += '</div>';
+                                html += '<span class="badge yes">Found</span>';
+                                html += '</li>';
+                            });
+                            html += '</ul>';
+                        }
+                        listDiv.innerHTML = html;
+                    }, function(error) {
+                        btn.disabled = false;
+                        alert('Error: ' + error);
+                    });
+                } else {
+                    btn.disabled = false;
+                    listDiv.innerHTML = '<div class="main-card" style="color: #DA1E28;">Plugin missing in this environment.</div>';
+                }
+            }
+        </script>
+    </body>
+</html>

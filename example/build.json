@@ -1,0 +1,12 @@
+{
+  "ios": {
+    "debug": {
+      "developmentTeam": "VZA8GB6CK7",
+      "packageType": "development"
+    },
+    "release": {
+      "developmentTeam": "VZA8GB6CK7",
+      "packageType": "app-store"
+    }
+  }
+}

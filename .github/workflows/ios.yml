@@ -1,0 +1,92 @@
+name: iOS Build
+
+# Builds the example Cordova app on Apple's hosted macOS runners. Produces:
+#   1. An iOS Simulator .app bundle (always builds, no signing needed)
+#   2. An unsigned device .app bundle (best-effort; cannot be installed on a
+#      stock iPhone without re-signing on a Mac or via a paid Apple Developer
+#      account + TestFlight)
+#
+# Triggers: every push, every PR, and a manual "Run workflow" button.
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build iOS demo
+    runs-on: macos-latest
+
+    defaults:
+      run:
+        working-directory: example
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+        working-directory: .
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Cordova
+        run: npm install -g cordova
+        working-directory: .
+
+      - name: Show Cordova environment
+        run: cordova -v && cordova requirements ios || true
+
+      - name: Add iOS platform
+        run: cordova platform add ios
+
+      - name: Prepare iOS
+        run: cordova prepare ios
+
+      - name: Build for iOS Simulator (unsigned)
+        run: cordova build ios --emulator --verbose
+
+      - name: Build for device (unsigned, best-effort)
+        id: device_build
+        continue-on-error: true
+        run: |
+          cordova build ios --device --verbose \
+            --buildFlag="CODE_SIGN_IDENTITY=" \
+            --buildFlag="CODE_SIGNING_REQUIRED=NO" \
+            --buildFlag="CODE_SIGNING_ALLOWED=NO"
+
+      - name: Locate built artifacts
+        run: |
+          echo "--- .app bundles ---"
+          find platforms/ios/build -type d -name "*.app" -maxdepth 8 -print || true
+          echo "--- .ipa files ---"
+          find platforms/ios/build -type f -name "*.ipa" -maxdepth 8 -print || true
+          echo "--- xcarchives ---"
+          find platforms/ios/build -type d -name "*.xcarchive" -maxdepth 8 -print || true
+
+      - name: Upload Simulator .app
+        uses: actions/upload-artifact@v4
+        with:
+          name: ApplistDemo-simulator
+          path: |
+            example/platforms/ios/build/**/Debug-iphonesimulator/*.app
+            example/platforms/ios/build/emulator/**/*.app
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload unsigned device .app
+        if: steps.device_build.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ApplistDemo-device-unsigned
+          path: |
+            example/platforms/ios/build/**/Release-iphoneos/*.app
+            example/platforms/ios/build/device/**/*.app
+          if-no-files-found: warn
+          retention-days: 14

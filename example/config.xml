@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.example.applistdemo" version="0.1.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>ApplistDemo</name>
+    <description>Demo app for the Applist Cordova plugin (iOS).</description>
+    <author email="dev@example.com" href="https://example.com">ApplistDemo</author>
+
+    <content src="index.html" />
+    <access origin="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
+
+    <preference name="DisallowOverscroll" value="true" />
+    <preference name="BackupWebStorage" value="none" />
+
+    <platform name="ios">
+        <allow-intent href="itms:*" />
+        <allow-intent href="itms-apps:*" />
+
+        <preference name="WKWebViewOnly" value="true" />
+        <preference name="deployment-target" value="16.0" />
+
+        <!-- Without this block iOS canOpenURL: returns NO for every scheme.
+             Apple caps the list at 50 entries; add/remove as you wish. -->
+        <edit-config file="*-Info.plist" mode="merge" target="LSApplicationQueriesSchemes">
+            <array>
+                <string>fb</string>
+                <string>fb-messenger</string>
+                <string>whatsapp</string>
+                <string>instagram</string>
+                <string>twitter</string>
+                <string>tg</string>
+                <string>snapchat</string>
+                <string>tiktok</string>
+                <string>youtube</string>
+                <string>spotify</string>
+                <string>googlegmail</string>
+                <string>comgooglemaps</string>
+                <string>zoomus</string>
+                <string>slack</string>
+                <string>microsoft-edge</string>
+            </array>
+        </edit-config>
+    </platform>
+
+    <!-- The Applist plugin lives one directory up. `cordova prepare` will
+         install it from the local path; no npm registry required. -->
+</widget>

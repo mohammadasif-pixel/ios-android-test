@@ -1,0 +1,14 @@
+node_modules/
+platforms/
+plugins/
+*.tgz
+*.log
+.DS_Store
+
+# Example app artifacts
+example/node_modules/
+example/platforms/
+example/plugins/
+example/www/cordova.js
+example/www/cordova_plugins.js
+example/www/plugins/
