@@ -5,7 +5,7 @@
         version="1.0.0">
 
     <name>InstalledApps</name>
-    <description>Cordova plugin to get list of all installed apps with icons for Android and iOS</description>
+    <description>Cordova plugin to detect installed apps (payment wallets / UPI / general) on Android and iOS.</description>
     <license>MIT</license>
 
     <js-module src="www/InstalledApps.js" name="InstalledApps">
@@ -24,6 +24,25 @@
             <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
         </config-file>
 
+        <!-- Android 11+ package visibility. Declare payment + common apps
+             so getPackageInfo / getApplicationInfo can see them without
+             relying on QUERY_ALL_PACKAGES (which Play restricts). -->
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <queries>
+                <package android:name="com.phonepe.app" />
+                <package android:name="com.google.android.apps.nbu.paisa.user" />
+                <package android:name="net.one97.paytm" />
+                <package android:name="in.org.npci.upiapp" />
+                <package android:name="in.amazon.mShop.android.shopping" />
+                <package android:name="com.whatsapp" />
+                <package android:name="com.dreamplug.androidapp" />
+                <package android:name="com.mobikwik_new" />
+                <package android:name="com.freecharge.android" />
+                <package android:name="com.myairtelapp" />
+                <package android:name="com.jio.jiopay" />
+            </queries>
+        </config-file>
+
         <source-file src="src/android/InstalledApps.java"
                      target-dir="src/com/plugin/installedapps" />
     </platform>
@@ -37,52 +56,19 @@
             </feature>
         </config-file>
 
-        <!-- Declare URL schemes the app is allowed to query via canOpenURL: -->
+        <!-- Declare URL schemes the app is allowed to query via canOpenURL:.
+             Payment schemes first, then general. Apple caps at 50 entries. -->
         <config-file target="*-Info.plist" parent="LSApplicationQueriesSchemes">
             <array>
-                <string>fb</string>
-                <string>whatsapp</string>
-                <string>twitter</string>
-                <string>twitterauth</string>
-                <string>instagram</string>
-                <string>googlegmail</string>
-                <string>youtube</string>
-                <string>spotify</string>
-                <string>tg</string>
-                <string>snapchat</string>
-                <string>viber</string>
-                <string>skype</string>
-                <string>linkedin</string>
-                <string>pinterest</string>
-                <string>tiktok</string>
-                <string>reddit</string>
-                <string>discord</string>
-                <string>signal</string>
-                <string>zoom</string>
-                <string>teams</string>
-                <string>slack</string>
-                <string>netflix</string>
-                <string>amazonprime</string>
-                <string>disneyplus</string>
-                <string>uber</string>
-                <string>lyft</string>
-                <string>maps</string>
-                <string>comgooglemaps</string>
-                <string>waze</string>
-                <string>shazam</string>
-                <string>paypal</string>
-                <string>venmo</string>
-                <string>cashapp</string>
-                <string>zelle</string>
-                <string>ebay</string>
-                <string>amazon</string>
-                <string>flipkart</string>
-                <string>swiggy</string>
-                <string>zomato</string>
                 <string>phonepe</string>
-                <string>paytm</string>
                 <string>gpay</string>
+                <string>tez</string>
+                <string>paytm</string>
+                <string>paytmmp</string>
                 <string>bhim</string>
+                <string>amazon</string>
+                <string>amazonpay</string>
+                <string>whatsapp</string>
                 <string>cred</string>
                 <string>mobikwik</string>
                 <string>freecharge</string>

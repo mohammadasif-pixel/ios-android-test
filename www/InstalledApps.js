@@ -18,6 +18,16 @@ var InstalledApps = {
      */
     getAppInfo: function (packageName, successCallback, errorCallback) {
         exec(successCallback, errorCallback, 'InstalledApps', 'getAppInfo', [packageName]);
+    },
+
+    /**
+     * Get list of installed payment apps only (UPI / wallets).
+     * Works on iOS, Android, and browser (mock).
+     * @param {Function} successCallback - Success callback with payment apps array
+     * @param {Function} errorCallback - Error callback
+     */
+    getPaymentApps: function (successCallback, errorCallback) {
+        exec(successCallback, errorCallback, 'InstalledApps', 'getPaymentApps', []);
     }
 };
 

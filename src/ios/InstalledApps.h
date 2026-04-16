@@ -4,5 +4,6 @@
 
 - (void)getInstalledApps:(CDVInvokedUrlCommand*)command;
 - (void)getAppInfo:(CDVInvokedUrlCommand*)command;
+- (void)getPaymentApps:(CDVInvokedUrlCommand*)command;
 
 @end

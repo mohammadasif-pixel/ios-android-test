@@ -182,6 +182,7 @@
 
             <div class="main-card">
                 <button onclick="getApps()" id="btn-get" disabled>Initializing...</button>
+                <button onclick="getPayments()" id="btn-pay" disabled style="margin-top:12px; padding:18px; font-size:18px; font-weight:600; background:linear-gradient(135deg,#24A148,#0F766E); color:white; border:none; border-radius:14px; width:100%; cursor:pointer; box-shadow:0 4px 15px rgba(36,161,72,0.3);">Initializing...</button>
             </div>
 
             <div id="appList"></div>
@@ -197,27 +198,27 @@
                 initialized = true;
                 
                 var btn = document.getElementById('btn-get');
+                var btnPay = document.getElementById('btn-pay');
                 btn.innerHTML = 'Scan Installed Apps';
                 btn.disabled = false;
+                btnPay.innerHTML = 'Scan Payment Apps';
+                btnPay.disabled = false;
                 console.log("App Initialized (Failsafe or DeviceReady)");
 
-                // Ensure the plugin is mocked if the official bridge failed
                 if (!(window.cordova && window.cordova.plugins && window.cordova.plugins.InstalledApps)) {
                     console.log("Injecting emergency browser mock...");
+                    var PAY_MOCK = [
+                        { appName: "Google Pay", packageName: "com.google.android.apps.nbu.paisa.user", urlScheme: "gpay",    icon: "https://cdn-icons-png.flaticon.com/512/6124/6124998.png" },
+                        { appName: "PhonePe",    packageName: "com.phonepe.app",                        urlScheme: "phonepe", icon: "https://cdn-icons-png.flaticon.com/512/825/825454.png" },
+                        { appName: "Paytm",      packageName: "net.one97.paytm",                        urlScheme: "paytm",   icon: "https://cdn-icons-png.flaticon.com/512/10046/10046638.png" },
+                        { appName: "WhatsApp",   packageName: "com.whatsapp",                           urlScheme: "whatsapp",icon: "https://cdn-icons-png.flaticon.com/512/3536/3536445.png" },
+                        { appName: "Amazon Pay", packageName: "in.amazon.mShop.android.shopping",       urlScheme: "amazon",  icon: "https://cdn-icons-png.flaticon.com/512/5968/5968202.png" }
+                    ];
                     window.cordova = window.cordova || {};
                     window.cordova.plugins = window.cordova.plugins || {};
                     window.cordova.plugins.InstalledApps = {
-                        getInstalledApps: function(success) {
-                            setTimeout(function() {
-                                success([
-                                    { appName: "PhonePe", urlScheme: "phonepe", icon: "https://cdn-icons-png.flaticon.com/512/825/825454.png" },
-                                    { appName: "Google Pay", urlScheme: "gpay", icon: "https://cdn-icons-png.flaticon.com/512/6124/6124998.png" },
-                                    { appName: "Paytm", urlScheme: "paytm", icon: "https://cdn-icons-png.flaticon.com/512/10046/10046638.png" },
-                                    { appName: "WhatsApp", urlScheme: "whatsapp", icon: "https://cdn-icons-png.flaticon.com/512/3536/3536445.png" },
-                                    { appName: "Amazon", urlScheme: "amazon", icon: "https://cdn-icons-png.flaticon.com/512/5968/5968202.png" }
-                                ]);
-                            }, 800);
-                        }
+                        getInstalledApps: function(success) { setTimeout(function(){ success(PAY_MOCK.slice()); }, 500); },
+                        getPaymentApps:   function(success) { setTimeout(function(){ success(PAY_MOCK.slice()); }, 500); }
                     };
                 }
             }
@@ -225,47 +226,51 @@
             document.addEventListener('deviceready', initApp, false);
             setTimeout(initApp, 3000); // 3-second failsafe
 
-            function getApps() {
+            function renderApps(apps, listDiv, emptyMsg) {
+                if (!apps || apps.length === 0) {
+                    listDiv.innerHTML = '<div class="main-card" style="text-align:center; color: var(--text-secondary);">' + emptyMsg + '</div>';
+                    return;
+                }
+                var html = '<ul>';
+                apps.forEach(function(app, index) {
+                    var delay = index * 0.05;
+                    html += '<li style="animation-delay: ' + delay + 's">';
+                    html += '<div class="icon-wrapper">';
+                    if (app.icon) { html += '<img src="' + app.icon + '" alt="icon" onerror="this.style.display=\'none\'" />'; }
+                    html += '</div>';
+                    html += '<div class="app-info">';
+                    html += '<span class="app-name">' + (app.appName || app.urlScheme || app.packageName) + '</span>';
+                    var sub = app.urlScheme ? (app.urlScheme + '://') : (app.packageName || 'N/A');
+                    html += '<span class="app-scheme">' + sub + '</span>';
+                    html += '</div>';
+                    html += '<span class="badge yes">Found</span>';
+                    html += '</li>';
+                });
+                html += '</ul>';
+                listDiv.innerHTML = html;
+            }
+
+            function runScan(method, btn, emptyMsg) {
                 var listDiv = document.getElementById('appList');
                 listDiv.innerHTML = '<div class="loading-shimmer">Scanning device for matches...</div>';
-                
-                var btn = document.getElementById('btn-get');
                 btn.disabled = true;
-
-                if (window.cordova && window.cordova.plugins && window.cordova.plugins.InstalledApps) {
-                    window.cordova.plugins.InstalledApps.getInstalledApps(function(apps) {
-                        btn.disabled = false;
-                        var html = '<ul>';
-                        if (apps.length === 0) {
-                            html = '<div class="main-card" style="text-align:center; color: var(--text-secondary);">No matching apps found.</div>';
-                        } else {
-                            apps.forEach(function(app, index) {
-                                var delay = index * 0.05;
-                                html += '<li style="animation-delay: ' + delay + 's">';
-                                html += '<div class="icon-wrapper">';
-                                if (app.icon) {
-                                    html += '<img src="' + app.icon + '" alt="icon" />';
-                                }
-                                html += '</div>';
-                                html += '<div class="app-info">';
-                                html += '<span class="app-name">' + (app.appName || app.urlScheme) + '</span>';
-                                html += '<span class="app-scheme">' + (app.urlScheme || 'N/A') + '://</span>';
-                                html += '</div>';
-                                html += '<span class="badge yes">Found</span>';
-                                html += '</li>';
-                            });
-                            html += '</ul>';
-                        }
-                        listDiv.innerHTML = html;
-                    }, function(error) {
-                        btn.disabled = false;
-                        alert('Error: ' + error);
-                    });
-                } else {
+                var plugin = window.cordova && window.cordova.plugins && window.cordova.plugins.InstalledApps;
+                if (!plugin || typeof plugin[method] !== 'function') {
                     btn.disabled = false;
-                    listDiv.innerHTML = '<div class="main-card" style="color: #DA1E28;">Plugin missing in this environment.</div>';
+                    listDiv.innerHTML = '<div class="main-card" style="color: #DA1E28;">Plugin method "' + method + '" missing in this environment.</div>';
+                    return;
                 }
+                plugin[method](function(apps) {
+                    btn.disabled = false;
+                    renderApps(apps, listDiv, emptyMsg);
+                }, function(err) {
+                    btn.disabled = false;
+                    listDiv.innerHTML = '<div class="main-card" style="color: #DA1E28;">Error: ' + err + '</div>';
+                });
             }
+
+            function getApps()     { runScan('getInstalledApps', document.getElementById('btn-get'), 'No matching apps found.'); }
+            function getPayments() { runScan('getPaymentApps',   document.getElementById('btn-pay'), 'No payment apps installed.'); }
         </script>
     </body>
 </html>
