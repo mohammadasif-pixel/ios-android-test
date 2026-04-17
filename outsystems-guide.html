@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>InstalledApps Plugin — OutSystems 11 iOS Integration Guide</title>
+<style>
+    :root {
+        --bg: #0f172a;
+        --panel: #1e293b;
+        --panel-2: #111827;
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --accent: #38bdf8;
+        --accent-2: #fbbf24;
+        --good: #34d399;
+        --bad: #f87171;
+        --border: #334155;
+        --code-bg: #0b1220;
+        --os-red: #e4002b;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+    }
+    header {
+        background: linear-gradient(135deg, var(--os-red) 0%, #6366f1 100%);
+        color: white;
+        padding: 48px 32px;
+        text-align: center;
+    }
+    header h1 { margin: 0 0 8px; font-size: 2.2rem; }
+    header p { margin: 0; opacity: 0.9; font-size: 1.05rem; }
+    header .badge {
+        display: inline-block;
+        background: rgba(255,255,255,0.2);
+        border-radius: 20px;
+        padding: 4px 16px;
+        margin-top: 12px;
+        font-size: 0.85rem;
+        letter-spacing: 0.04em;
+    }
+    .container {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 32px;
+    }
+    nav.toc {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 20px 24px;
+        margin-bottom: 32px;
+    }
+    nav.toc h3 { margin: 0 0 12px; color: var(--accent); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.08em; }
+    nav.toc ol { margin: 0; padding-left: 20px; }
+    nav.toc li { margin: 4px 0; }
+    nav.toc a { color: var(--text); text-decoration: none; border-bottom: 1px dashed var(--border); }
+    nav.toc a:hover { color: var(--accent); }
+    section {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 28px 32px;
+        margin-bottom: 24px;
+    }
+    section h2 {
+        margin: 0 0 16px;
+        color: var(--accent);
+        font-size: 1.5rem;
+        border-bottom: 2px solid var(--border);
+        padding-bottom: 10px;
+    }
+    section h3 { color: var(--accent-2); margin-top: 24px; }
+    section h4 { color: var(--text); margin-top: 18px; font-size: 1rem; }
+    section p { margin: 12px 0; }
+    code.inline, code.il {
+        background: var(--code-bg);
+        color: var(--accent-2);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.9em;
+        font-family: "SF Mono", Consolas, Menlo, monospace;
+    }
+    pre {
+        background: var(--code-bg);
+        color: #e2e8f0;
+        padding: 16px 20px;
+        border-radius: 6px;
+        overflow-x: auto;
+        border-left: 3px solid var(--accent);
+        font-family: "SF Mono", Consolas, Menlo, monospace;
+        font-size: 0.88rem;
+        line-height: 1.5;
+    }
+    pre code { color: inherit; background: none; padding: 0; }
+    .tag-json  { color: #f472b6; }
+    .tag-key   { color: #7dd3fc; }
+    .tag-str   { color: #fbbf24; }
+    .tag-cmt   { color: #64748b; font-style: italic; }
+    .tag-kw    { color: #c084fc; }
+    .tag-fn    { color: #60a5fa; }
+    .callout {
+        border-radius: 6px;
+        padding: 14px 18px;
+        margin: 16px 0;
+        border-left: 4px solid;
+    }
+    .callout.info    { background: rgba(56,189,248,0.08); border-color: var(--accent); }
+    .callout.warn    { background: rgba(251,191,36,0.1);  border-color: var(--accent-2); }
+    .callout.danger  { background: rgba(248,113,113,0.1); border-color: var(--bad); }
+    .callout.success { background: rgba(52,211,153,0.1);  border-color: var(--good); }
+    .callout.os11    { background: rgba(228,0,43,0.08);   border-color: var(--os-red); }
+    .callout b { display: block; margin-bottom: 4px; letter-spacing: 0.04em; text-transform: uppercase; font-size: 0.78rem; }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0;
+        background: var(--panel-2);
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    th, td {
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.93rem;
+    }
+    th { background: var(--code-bg); color: var(--accent); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; }
+    tr:last-child td { border-bottom: none; }
+    .step-num {
+        display: inline-block;
+        background: var(--accent);
+        color: var(--bg);
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 28px;
+        font-weight: 700;
+        margin-right: 10px;
+        font-size: 0.9rem;
+        vertical-align: middle;
+    }
+    .flow-diagram {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        font-family: "SF Mono", Consolas, Menlo, monospace;
+        font-size: 0.9rem;
+        line-height: 2.2;
+        color: var(--text);
+        margin: 16px 0;
+    }
+    .flow-diagram .node {
+        display: inline-block;
+        background: var(--panel);
+        border: 1px solid var(--accent);
+        border-radius: 6px;
+        padding: 4px 14px;
+        margin: 4px 0;
+    }
+    .flow-diagram .arrow { color: var(--accent); margin: 0 4px; }
+    .checklist { list-style: none; padding-left: 0; }
+    .checklist li { padding: 6px 0 6px 28px; position: relative; }
+    .checklist li::before {
+        content: "\2610";
+        position: absolute;
+        left: 0;
+        color: var(--accent);
+        font-size: 1.1em;
+    }
+    footer {
+        text-align: center;
+        padding: 32px;
+        color: var(--muted);
+        font-size: 0.88rem;
+    }
+    kbd {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 2px 8px;
+        font-family: monospace;
+        font-size: 0.85em;
+        color: var(--text);
+    }
+    .copy-hint { color: var(--muted); font-size: 0.82rem; margin-top: -8px; margin-bottom: 12px; }
+    .path-breadcrumb {
+        color: var(--muted);
+        font-size: 0.85rem;
+        font-family: "SF Mono", Consolas, Menlo, monospace;
+        margin-bottom: 8px;
+    }
+    .path-breadcrumb span { color: var(--accent); }
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin: 16px 0;
+    }
+    .grid-2 > div {
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 16px;
+    }
+    .grid-2 h4 { margin-top: 0; color: var(--accent-2); }
+    @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>InstalledApps Plugin &mdash; iOS Only</h1>
+    <p>Step-by-step guide to integrate the iOS Cordova plugin in OutSystems 11 using Service Studio + MABS.</p>
+    <div class="badge">iOS Only &nbsp;|&nbsp; OutSystems 11 &nbsp;|&nbsp; MABS 10+ &nbsp;|&nbsp; Cordova iOS &ge; 6.0</div>
+</header>
+
+<div class="container">
+
+<!-- ============================================ TOC -->
+<nav class="toc">
+    <h3>Contents</h3>
+    <ol>
+        <li><a href="#overview">Overview &amp; Prerequisites</a></li>
+        <li><a href="#host">Step 1 &mdash; Host the Plugin</a></li>
+        <li><a href="#extensibility">Step 2 &mdash; Extensibility Configuration</a></li>
+        <li><a href="#mabs">Step 3 &mdash; Set MABS Version</a></li>
+        <li><a href="#structure">Step 4 &mdash; Create the PaymentApp Structure</a></li>
+        <li><a href="#client-action">Step 5 &mdash; Create Client Action (GetPaymentApps)</a></li>
+        <li><a href="#jsnode">Step 6 &mdash; JavaScript Node Setup</a></li>
+        <li><a href="#wiring">Step 7 &mdash; Wire JSONDeserialize &amp; Assign</a></li>
+        <li><a href="#screen">Step 8 &mdash; Bind to Screen</a></li>
+        <li><a href="#certificates">Step 9 &mdash; iOS Certificates in LifeTime</a></li>
+        <li><a href="#build">Step 10 &mdash; Generate iOS Build</a></li>
+        <li><a href="#testing">Step 11 &mdash; Testing on Device</a></li>
+        <li><a href="#ios-notes">iOS-Specific Notes</a></li>
+        <li><a href="#troubleshoot">Troubleshooting</a></li>
+        <li><a href="#api">API Reference</a></li>
+        <li><a href="#checklist">Quick Checklist</a></li>
+    </ol>
+</nav>
+
+<!-- ============================================ 1 OVERVIEW -->
+<section id="overview">
+    <h2><span class="step-num">1</span> Overview &amp; Prerequisites</h2>
+    <p>
+        The <code class="il">cordova-plugin-installed-apps</code> plugin detects which payment / UPI wallets
+        (PhonePe, Google&nbsp;Pay, Paytm, BHIM, etc.) are installed on the user&rsquo;s iPhone.
+        This is an <b>iOS-only</b> plugin &mdash; no Android code included.
+    </p>
+
+    <h3>How it works on iOS</h3>
+    <p>
+        iOS uses <code class="il">UIApplication.canOpenURL:</code> to check if an app is installed.
+        The plugin declares 14 payment app URL schemes in <code class="il">Info.plist</code> via
+        <code class="il">LSApplicationQueriesSchemes</code>. At runtime it checks each scheme and returns
+        only the apps that are actually installed.
+    </p>
+
+    <h3>What you need</h3>
+    <table>
+        <tr><th>Requirement</th><th>Details</th></tr>
+        <tr><td>OutSystems 11</td><td>Platform Server 11.x with LifeTime access</td></tr>
+        <tr><td>Service Studio</td><td>11.54+ recommended</td></tr>
+        <tr><td>MABS</td><td><b>10.0 or higher</b> (for async <code class="il">$resolve</code> JS pattern)</td></tr>
+        <tr><td>Apple Developer Account</td><td>Enrolled in Apple Developer Program ($99/year)</td></tr>
+        <tr><td>iOS Distribution Certificate</td><td><code class="il">.p12</code> file with password</td></tr>
+        <tr><td>Provisioning Profile</td><td><code class="il">.mobileprovision</code> (Ad Hoc or App Store)</td></tr>
+        <tr><td>Plugin source</td><td>Public Git repo <b>or</b> uploaded <code class="il">.zip</code></td></tr>
+        <tr><td>Test device</td><td>Real iPhone / iPad (simulator won&rsquo;t have payment apps)</td></tr>
+    </table>
+
+    <div class="callout warn">
+        <b>Important</b>
+        This plugin is iOS-only. It will not work on Android builds. If you need Android support, use a separate Android plugin.
+    </div>
+</section>
+
+<!-- ============================================ 2 HOST PLUGIN -->
+<section id="host">
+    <h2><span class="step-num">2</span> Step 1 &mdash; Host the Plugin</h2>
+    <p>MABS needs to fetch the plugin source at build time. Two options:</p>
+
+    <div class="grid-2">
+        <div>
+            <h4>Option A &mdash; Git Repo (recommended)</h4>
+            <p>Push this repo to GitHub / Bitbucket / GitLab. Make sure <code class="il">plugin.xml</code> is at the repo root.</p>
+            <p>For private repos, use a Personal Access Token:</p>
+            <pre><code>https://&lt;TOKEN&gt;@github.com/&lt;org&gt;/cordova-plugin-installed-apps.git</code></pre>
+        </div>
+        <div>
+            <h4>Option B &mdash; ZIP Resource</h4>
+            <p>Zip the plugin so <code class="il">plugin.xml</code> sits at the archive root (not inside a subfolder).</p>
+            <p>Upload the <code class="il">.zip</code> as a <b>Resource</b> in your OutSystems module.</p>
+        </div>
+    </div>
+
+    <div class="callout info">
+        <b>Plugin file structure</b>
+        Your zip or repo root must look like this:
+    </div>
+    <pre><code>plugin.xml
+package.json
+www/
+  InstalledApps.js
+src/
+  ios/
+    InstalledApps.h
+    InstalledApps.m</code></pre>
+</section>
+
+<!-- ============================================ 3 EXTENSIBILITY -->
+<section id="extensibility">
+    <h2><span class="step-num">3</span> Step 2 &mdash; Extensibility Configuration</h2>
+
+    <p class="path-breadcrumb">Service Studio &rarr; <span>your module</span> &rarr; Data tab &rarr; click <span>module name</span> &rarr; right panel &rarr; <span>Extensibility Configurations</span></p>
+
+    <h3>Single plugin (simplest)</h3>
+    <pre><code><span class="tag-json">{</span>
+  <span class="tag-key">"plugin"</span>: <span class="tag-json">{</span>
+    <span class="tag-key">"url"</span>:  <span class="tag-str">"https://github.com/&lt;your-org&gt;/cordova-plugin-installed-apps.git"</span>,
+    <span class="tag-key">"name"</span>: <span class="tag-str">"cordova-plugin-installed-apps"</span>
+  <span class="tag-json">}</span>
+<span class="tag-json">}</span></code></pre>
+
+    <h3>Multiple plugins</h3>
+    <p>Use the <code class="il">"plugins"</code> array format:</p>
+    <pre><code><span class="tag-json">{</span>
+  <span class="tag-key">"plugins"</span>: <span class="tag-json">[</span>
+    <span class="tag-json">{</span>
+      <span class="tag-key">"url"</span>: <span class="tag-str">"https://github.com/&lt;org&gt;/cordova-plugin-installed-apps.git"</span>
+    <span class="tag-json">}</span>,
+    <span class="tag-json">{</span>
+      <span class="tag-key">"url"</span>: <span class="tag-str">"https://github.com/other/other-plugin.git"</span>
+    <span class="tag-json">}</span>
+  <span class="tag-json">]</span>
+<span class="tag-json">}</span></code></pre>
+
+    <h3>Using ZIP resource</h3>
+    <pre><code><span class="tag-json">{</span>
+  <span class="tag-key">"plugin"</span>: <span class="tag-json">{</span>
+    <span class="tag-key">"url"</span>: <span class="tag-str">"resource://cordova-plugin-installed-apps.zip"</span>
+  <span class="tag-json">}</span>
+<span class="tag-json">}</span></code></pre>
+    <p class="copy-hint">The <code class="il">resource://</code> prefix tells MABS to look in the module&rsquo;s Resources folder.</p>
+
+    <div class="callout os11">
+        <b>OutSystems 11 Note</b>
+        Extensibility Configurations only accepts valid JSON. If malformed, Service Studio silently ignores it and plugin won&rsquo;t install. Validate your JSON before pasting.
+    </div>
+</section>
+
+<!-- ============================================ 4 MABS VERSION -->
+<section id="mabs">
+    <h2><span class="step-num">4</span> Step 3 &mdash; Set MABS Version</h2>
+    <p>This plugin uses the async <code class="il">$resolve</code> pattern in JavaScript, which requires <b>MABS 10+</b>.</p>
+
+    <h3>Option A &mdash; Force via Extensibility</h3>
+    <pre><code><span class="tag-json">{</span>
+  <span class="tag-key">"plugin"</span>: <span class="tag-json">{</span>
+    <span class="tag-key">"url"</span>: <span class="tag-str">"https://github.com/&lt;org&gt;/cordova-plugin-installed-apps.git"</span>
+  <span class="tag-json">}</span>,
+  <span class="tag-key">"preferences"</span>: <span class="tag-json">{</span>
+    <span class="tag-key">"global"</span>: <span class="tag-json">[</span>
+      <span class="tag-json">{</span> <span class="tag-key">"name"</span>: <span class="tag-str">"mabs-version"</span>, <span class="tag-key">"value"</span>: <span class="tag-str">"10.0"</span> <span class="tag-json">}</span>
+    <span class="tag-json">]</span>
+  <span class="tag-json">}</span>
+<span class="tag-json">}</span></code></pre>
+
+    <h3>Option B &mdash; Check in LifeTime</h3>
+    <p class="path-breadcrumb">LifeTime &rarr; <span>Environments</span> &rarr; your environment &rarr; <span>Mobile Apps Build Service</span></p>
+    <p>Confirm MABS version is 10.0 or higher.</p>
+
+    <div class="callout warn">
+        <b>Stuck on MABS 9?</b>
+        The <code class="il">$resolve</code> async pattern won&rsquo;t work. See the MABS 9 fallback in Step 6 below.
+    </div>
+</section>
+
+<!-- ============================================ 5 STRUCTURE -->
+<section id="structure">
+    <h2><span class="step-num">5</span> Step 4 &mdash; Create the PaymentApp Structure</h2>
+
+    <p class="path-breadcrumb">Service Studio &rarr; <span>Data</span> tab &rarr; right-click <span>Structures</span> &rarr; <span>Add Structure</span></p>
+
+    <p>Name it <b>PaymentApp</b>. Add these attributes:</p>
+
+    <table>
+        <tr><th>Attribute</th><th>Data Type</th><th>Description</th></tr>
+        <tr><td>AppName</td><td>Text</td><td>Display name (e.g. &ldquo;PhonePe&rdquo;)</td></tr>
+        <tr><td>UrlScheme</td><td>Text</td><td>iOS URL scheme (e.g. &ldquo;phonepe&rdquo;)</td></tr>
+        <tr><td>PackageName</td><td>Text</td><td>Android package ID (included in response for reference)</td></tr>
+        <tr><td>IsSystemApp</td><td>Boolean</td><td>Always False for payment apps</td></tr>
+        <tr><td>Icon</td><td>Text</td><td>Remote icon URL</td></tr>
+    </table>
+</section>
+
+<!-- ============================================ 6 CLIENT ACTION -->
+<section id="client-action">
+    <h2><span class="step-num">6</span> Step 5 &mdash; Create Client Action</h2>
+
+    <p class="path-breadcrumb">Service Studio &rarr; <span>Logic</span> tab &rarr; right-click <span>Client Actions</span> &rarr; <span>Add Client Action</span></p>
+
+    <p>Name: <b>GetPaymentApps</b></p>
+
+    <h3>Output Parameters</h3>
+    <table>
+        <tr><th>Name</th><th>Data Type</th></tr>
+        <tr><td>Apps</td><td>PaymentApp List</td></tr>
+        <tr><td>ErrorMsg</td><td>Text</td></tr>
+    </table>
+
+    <h3>Action Flow</h3>
+    <div class="flow-diagram">
+        <span class="node">Start</span><br/>
+        <span class="arrow">&darr;</span><br/>
+        <span class="node" style="border-color: var(--accent-2);">JavaScript &mdash; CallPlugin</span><br/>
+        <span class="arrow">&darr;</span><br/>
+        <span class="node">JSONDeserialize</span><br/>
+        <span class="arrow">&darr;</span><br/>
+        <span class="node">Assign</span><br/>
+        <span class="arrow">&darr;</span><br/>
+        <span class="node">End</span>
+    </div>
+</section>
+
+<!-- ============================================ 7 JS NODE -->
+<section id="jsnode">
+    <h2><span class="step-num">7</span> Step 6 &mdash; JavaScript Node Setup</h2>
+
+    <p>Double-click the JavaScript node (<b>CallPlugin</b>). In the right panel:</p>
+
+    <h3>6a &mdash; Add Output Parameters to JS Node</h3>
+    <table>
+        <tr><th>Name</th><th>Data Type</th></tr>
+        <tr><td>AppsJson</td><td>Text</td></tr>
+        <tr><td>ErrorMsg</td><td>Text</td></tr>
+    </table>
+
+    <h3>6b &mdash; JavaScript Body (MABS 10+)</h3>
+    <p class="copy-hint">Copy-paste this exactly into the JavaScript editor:</p>
+
+    <pre><code><span class="tag-kw">var</span> done = $resolve;   <span class="tag-cmt">// async pattern — MABS 10+ / ODC</span>
+
+<span class="tag-cmt">// Guard: plugin only exists on native device builds</span>
+<span class="tag-kw">if</span> (!window.cordova || !cordova.plugins || !cordova.plugins.InstalledApps) {
+    $parameters.AppsJson = <span class="tag-str">"[]"</span>;
+    $parameters.ErrorMsg = <span class="tag-str">"Plugin not available — run on a real device, not Preview in Browser."</span>;
+    <span class="tag-kw">return</span> done();
+}
+
+cordova.plugins.InstalledApps.<span class="tag-fn">getPaymentApps</span>(
+    <span class="tag-kw">function</span> (apps) {
+        $parameters.AppsJson = <span class="tag-fn">JSON.stringify</span>(apps || []);
+        $parameters.ErrorMsg = <span class="tag-str">""</span>;
+        done();
+    },
+    <span class="tag-kw">function</span> (err) {
+        $parameters.AppsJson = <span class="tag-str">"[]"</span>;
+        $parameters.ErrorMsg = <span class="tag-fn">String</span>(err || <span class="tag-str">"unknown error"</span>);
+        done();
+    }
+);</code></pre>
+
+    <h3>6c &mdash; MABS 9 Fallback (if you cannot upgrade)</h3>
+    <div class="callout warn">
+        <b>MABS 9 — synchronous JS node</b>
+        On MABS 9, <code class="il">$resolve</code> does not work. Use client variables + timer delay instead.
+    </div>
+
+    <p><b>Step 1:</b> Create two <b>Client Variables</b> at module level:</p>
+    <table>
+        <tr><th>Name</th><th>Data Type</th></tr>
+        <tr><td>CV_PaymentAppsJson</td><td>Text</td></tr>
+        <tr><td>CV_PaymentAppsError</td><td>Text</td></tr>
+    </table>
+
+    <p><b>Step 2:</b> Use this JavaScript body:</p>
+
+    <pre><code><span class="tag-cmt">// MABS 9 sync fallback</span>
+<span class="tag-kw">if</span> (!window.cordova || !cordova.plugins || !cordova.plugins.InstalledApps) {
+    $parameters.AppsJson = <span class="tag-str">"[]"</span>;
+    $parameters.ErrorMsg = <span class="tag-str">"Plugin not available."</span>;
+    <span class="tag-kw">return</span>;
+}
+
+cordova.plugins.InstalledApps.<span class="tag-fn">getPaymentApps</span>(
+    <span class="tag-kw">function</span> (apps) {
+        $public.ClientVariables.CV_PaymentAppsJson = <span class="tag-fn">JSON.stringify</span>(apps || []);
+        $public.ClientVariables.CV_PaymentAppsError = <span class="tag-str">""</span>;
+    },
+    <span class="tag-kw">function</span> (err) {
+        $public.ClientVariables.CV_PaymentAppsJson = <span class="tag-str">"[]"</span>;
+        $public.ClientVariables.CV_PaymentAppsError = <span class="tag-fn">String</span>(err || <span class="tag-str">"unknown"</span>);
+    }
+);
+
+$parameters.AppsJson = <span class="tag-str">"[]"</span>;
+$parameters.ErrorMsg = <span class="tag-str">"loading"</span>;</code></pre>
+
+    <p><b>Step 3:</b> After calling <code class="il">GetPaymentApps</code>, add a <b>Timer delay</b> (500ms), then read from <code class="il">Client.CV_PaymentAppsJson</code> and re-run JSONDeserialize.</p>
+</section>
+
+<!-- ============================================ 8 WIRING -->
+<section id="wiring">
+    <h2><span class="step-num">8</span> Step 7 &mdash; Wire JSONDeserialize &amp; Assign</h2>
+
+    <h3>JSONDeserialize</h3>
+    <p>Drag <b>JSONDeserialize</b> from the <code class="il">System</code> toolbox after the JavaScript node:</p>
+    <table>
+        <tr><th>Property</th><th>Value</th></tr>
+        <tr><td>JSON String</td><td><code class="il">CallPlugin.AppsJson</code></td></tr>
+        <tr><td>Data Type</td><td><code class="il">PaymentApp List</code></td></tr>
+    </table>
+
+    <h3>Assign</h3>
+    <table>
+        <tr><th>Variable</th><th>Value</th></tr>
+        <tr><td><code class="il">Apps</code></td><td><code class="il">JSONDeserialize1.Data</code></td></tr>
+        <tr><td><code class="il">ErrorMsg</code></td><td><code class="il">CallPlugin.ErrorMsg</code></td></tr>
+    </table>
+</section>
+
+<!-- ============================================ 9 SCREEN -->
+<section id="screen">
+    <h2><span class="step-num">9</span> Step 8 &mdash; Bind to Screen</h2>
+
+    <h3>Call from OnReady</h3>
+    <p class="path-breadcrumb">Screen &rarr; <span>Events</span> &rarr; <span>OnReady</span> handler</p>
+    <ol>
+        <li>Drag <b>GetPaymentApps</b> into the OnReady flow.</li>
+        <li>Add an <b>If</b> node: <code class="il">GetPaymentApps.ErrorMsg = ""</code></li>
+        <li><b>True branch:</b> Assign local variable <code class="il">PaymentAppsList</code> (type <code class="il">PaymentApp List</code>) = <code class="il">GetPaymentApps.Apps</code></li>
+        <li><b>False branch:</b> Show feedback message with error.</li>
+    </ol>
+
+    <h3>Display in a List</h3>
+    <p>Drag a <b>List</b> widget onto the screen. Set <b>Source</b> = <code class="il">PaymentAppsList</code>. Inside the list item:</p>
+    <table>
+        <tr><th>Widget</th><th>Binding</th></tr>
+        <tr><td>Image</td><td><code class="il">Current.PaymentApp.Icon</code> (Type: External URL)</td></tr>
+        <tr><td>Expression (name)</td><td><code class="il">Current.PaymentApp.AppName</code></td></tr>
+        <tr><td>Expression (scheme)</td><td><code class="il">Current.PaymentApp.UrlScheme</code></td></tr>
+    </table>
+</section>
+
+<!-- ============================================ 10 CERTIFICATES -->
+<section id="certificates">
+    <h2><span class="step-num">10</span> Step 9 &mdash; iOS Certificates in LifeTime</h2>
+
+    <p class="path-breadcrumb">LifeTime &rarr; <span>Applications</span> &rarr; your app &rarr; <span>Native Platforms</span> &rarr; <span>Configure iOS App</span></p>
+
+    <h3>What you need from Apple Developer Portal</h3>
+    <table>
+        <tr><th>Item</th><th>Where to get it</th><th>Format</th></tr>
+        <tr><td>Distribution Certificate</td><td>Certificates, IDs &amp; Profiles &rarr; Certificates</td><td><code class="il">.p12</code> + password</td></tr>
+        <tr><td>Provisioning Profile</td><td>Profiles &rarr; iOS App Development or Distribution</td><td><code class="il">.mobileprovision</code></td></tr>
+    </table>
+
+    <h3>Upload in LifeTime</h3>
+    <ol>
+        <li>Click <b>Configure iOS App</b></li>
+        <li>Upload the <code class="il">.p12</code> file and enter its password</li>
+        <li>Upload the <code class="il">.mobileprovision</code> file</li>
+        <li>Set <b>Bundle Identifier</b> to match your provisioning profile (e.g. <code class="il">com.magentamobility.yourapp</code>)</li>
+        <li>Click <b>Save</b></li>
+    </ol>
+
+    <div class="callout danger">
+        <b>Critical</b>
+        The provisioning profile must include <code class="il">LSApplicationQueriesSchemes</code> entitlement support. Standard Distribution and Ad Hoc profiles support this by default. No special entitlements needed.
+    </div>
+</section>
+
+<!-- ============================================ 11 BUILD -->
+<section id="build">
+    <h2><span class="step-num">11</span> Step 10 &mdash; Generate iOS Build</h2>
+
+    <p class="path-breadcrumb">LifeTime &rarr; <span>Applications</span> &rarr; your app &rarr; <span>Native Platforms</span> &rarr; <span>Generate iOS App</span></p>
+
+    <ol>
+        <li>Click <b>Generate iOS App</b></li>
+        <li>MABS will:
+            <ul>
+                <li>Fetch plugin from Git URL / ZIP resource</li>
+                <li>Merge 14 URL schemes into <code class="il">Info.plist</code> (<code class="il">LSApplicationQueriesSchemes</code>)</li>
+                <li>Compile <code class="il">InstalledApps.h</code> + <code class="il">InstalledApps.m</code> (Objective-C)</li>
+                <li>Sign the IPA with your certificate</li>
+            </ul>
+        </li>
+        <li>Wait for build to complete (6&ndash;12 minutes first build)</li>
+        <li>Download the <code class="il">.ipa</code> file</li>
+    </ol>
+
+    <h3>Install the IPA</h3>
+    <div class="grid-2">
+        <div>
+            <h4>TestFlight (App Store profile)</h4>
+            <p>Upload IPA to App Store Connect &rarr; TestFlight &rarr; invite testers.</p>
+        </div>
+        <div>
+            <h4>Ad Hoc</h4>
+            <p>Distribute via Diawi, AppCenter, or direct install on registered devices.</p>
+        </div>
+    </div>
+
+    <div class="callout info">
+        <b>Build log</b>
+        If build fails, check MABS log: LifeTime &rarr; Native Platforms &rarr; <b>Download Build Logs</b>. Search for <code class="il">cordova-plugin-installed-apps</code>.
+    </div>
+</section>
+
+<!-- ============================================ 12 TESTING -->
+<section id="testing">
+    <h2><span class="step-num">12</span> Step 11 &mdash; Testing on Device</h2>
+
+    <h3>Test Cases</h3>
+    <table>
+        <tr><th>#</th><th>Test</th><th>Expected Result</th></tr>
+        <tr><td>1</td><td>Open app on iPhone with PhonePe + GPay installed</td><td>List shows PhonePe, Google Pay with icons</td></tr>
+        <tr><td>2</td><td>Open app on iPhone with no payment apps</td><td>Empty list, no error</td></tr>
+        <tr><td>3</td><td>Uninstall PhonePe, re-open app</td><td>PhonePe disappears from list</td></tr>
+        <tr><td>4</td><td>Run in Preview in Browser</td><td>ErrorMsg = &ldquo;Plugin not available&rdquo;, graceful fallback</td></tr>
+    </table>
+
+    <div class="callout danger">
+        <b>Simulator limitation</b>
+        iOS Simulator cannot install third-party apps. <code class="il">canOpenURL:</code> will always return false. <b>You must test on a real iPhone.</b>
+    </div>
+</section>
+
+<!-- ============================================ 13 IOS NOTES -->
+<section id="ios-notes">
+    <h2>iOS-Specific Notes</h2>
+
+    <h3>LSApplicationQueriesSchemes</h3>
+    <p>Apple caps URL scheme whitelist at <b>50 entries</b>. This plugin uses 14. Count other plugins&rsquo; schemes before submitting to App Store.</p>
+    <p>Declared schemes:</p>
+    <pre><code>phonepe, gpay, tez, paytm, paytmmp, bhim, amazon, amazonpay,
+whatsapp, cred, mobikwik, freecharge, airtel, jiopay</code></pre>
+
+    <h3>How Detection Works</h3>
+    <p>iOS uses <code class="il">UIApplication.canOpenURL:</code>. Returns <code class="il">true</code> only if:</p>
+    <ol>
+        <li>URL scheme is listed in <code class="il">LSApplicationQueriesSchemes</code> (handled by plugin.xml)</li>
+        <li>Target app is actually installed on device</li>
+        <li>Build is properly signed</li>
+    </ol>
+
+    <h3>Privacy Manifest (iOS 17+)</h3>
+    <p><code class="il">canOpenURL:</code> is <b>not</b> a tracked API under Apple&rsquo;s privacy-manifest requirements. No <code class="il">PrivacyInfo.xcprivacy</code> changes needed.</p>
+
+    <h3>App Store Review</h3>
+    <p>If Apple asks why you query payment schemes:</p>
+    <div class="callout info">
+        <b>Suggested response</b>
+        &ldquo;We query UPI payment app URL schemes to display only the wallets the user already has installed, providing a streamlined checkout experience. We do not collect or transmit any data about installed applications.&rdquo;
+    </div>
+</section>
+
+<!-- ============================================ 14 TROUBLESHOOTING -->
+<section id="troubleshoot">
+    <h2>Troubleshooting</h2>
+
+    <table>
+        <tr><th style="width:40%">Symptom</th><th>Cause &amp; Fix</th></tr>
+        <tr>
+            <td><code class="il">cordova.plugins.InstalledApps is undefined</code></td>
+            <td>Running in <b>Preview in Browser</b>. Plugin is native-only. Deploy to real device. JS guard in Step 6 handles this gracefully.</td>
+        </tr>
+        <tr>
+            <td>Empty list on device with payment apps installed</td>
+            <td>Build not signed with correct profile. <code class="il">canOpenURL:</code> returns false for unsigned/debug builds. Rebuild with distribution certificate.</td>
+        </tr>
+        <tr>
+            <td>MABS error: <i>&ldquo;Plugin doesn&rsquo;t support cordova-ios&rdquo;</i></td>
+            <td>MABS version too old. Add <code class="il">mabs-version: 10.0</code> preference (Step 3).</td>
+        </tr>
+        <tr>
+            <td>MABS error: <i>&ldquo;Failed to fetch plugin&rdquo;</i></td>
+            <td>Git URL unreachable. Check: repo is public (or token URL for private), <code class="il">plugin.xml</code> at repo root, URL ends in <code class="il">.git</code>.</td>
+        </tr>
+        <tr>
+            <td>JS node returns immediately with empty data (MABS 9)</td>
+            <td><code class="il">$resolve</code> not supported. Use MABS 9 fallback (Step 6c).</td>
+        </tr>
+        <tr>
+            <td>JSON parse error in JSONDeserialize</td>
+            <td>Plugin returned unexpected format. Log <code class="il">AppsJson</code> value. Common cause: plugin not installed (returns undefined).</td>
+        </tr>
+        <tr>
+            <td>App Store reject: <i>&ldquo;Non-public API&rdquo;</i></td>
+            <td>Not caused by this plugin &mdash; only public <code class="il">UIApplication</code> APIs used. Check other plugins.</td>
+        </tr>
+        <tr>
+            <td>Duplicate <code class="il">LSApplicationQueriesSchemes</code> warning</td>
+            <td>Another plugin also declares URL schemes. Cordova merges them &mdash; warning is safe to ignore.</td>
+        </tr>
+    </table>
+</section>
+
+<!-- ============================================ 15 API REFERENCE -->
+<section id="api">
+    <h2>API Reference</h2>
+
+    <h3><code class="il">getPaymentApps(successCallback, errorCallback)</code></h3>
+    <p>Returns only UPI / wallet apps from the built-in catalog. <b>Recommended for checkout flows.</b></p>
+
+    <h3><code class="il">getInstalledApps(successCallback, errorCallback)</code></h3>
+    <p>Returns every app whose URL scheme is declared in <code class="il">LSApplicationQueriesSchemes</code>.</p>
+
+    <h3><code class="il">getAppInfo(bundleId, successCallback, errorCallback)</code></h3>
+    <p>Detailed info for a single app. On iOS, privacy restrictions limit this to the host app&rsquo;s own bundle ID only.</p>
+
+    <h3>Response Shape (getPaymentApps array element)</h3>
+    <pre><code><span class="tag-json">{</span>
+  <span class="tag-key">"appName"</span>:     <span class="tag-str">"PhonePe"</span>,
+  <span class="tag-key">"packageName"</span>: <span class="tag-str">"com.phonepe.app"</span>,       <span class="tag-cmt">// from catalog (for reference)</span>
+  <span class="tag-key">"urlScheme"</span>:   <span class="tag-str">"phonepe"</span>,               <span class="tag-cmt">// iOS URL scheme used for detection</span>
+  <span class="tag-key">"isSystemApp"</span>: <span class="tag-kw">false</span>,
+  <span class="tag-key">"icon"</span>:        <span class="tag-str">"https://cdn-icons-png.flaticon.com/512/825/825454.png"</span>
+<span class="tag-json">}</span></code></pre>
+
+    <h3>Supported Payment Apps (14 total)</h3>
+    <table>
+        <tr><th>App</th><th>iOS URL Scheme</th></tr>
+        <tr><td>PhonePe</td><td><code class="il">phonepe</code></td></tr>
+        <tr><td>Google Pay</td><td><code class="il">gpay</code></td></tr>
+        <tr><td>Paytm</td><td><code class="il">paytm</code></td></tr>
+        <tr><td>BHIM</td><td><code class="il">bhim</code></td></tr>
+        <tr><td>Amazon Pay</td><td><code class="il">amazon</code></td></tr>
+        <tr><td>WhatsApp</td><td><code class="il">whatsapp</code></td></tr>
+        <tr><td>CRED</td><td><code class="il">cred</code></td></tr>
+        <tr><td>MobiKwik</td><td><code class="il">mobikwik</code></td></tr>
+        <tr><td>Freecharge</td><td><code class="il">freecharge</code></td></tr>
+        <tr><td>Airtel Payments Bank</td><td><code class="il">airtel</code></td></tr>
+        <tr><td>JioPay</td><td><code class="il">jiopay</code></td></tr>
+    </table>
+</section>
+
+<!-- ============================================ 16 CHECKLIST -->
+<section id="checklist">
+    <h2>Quick Checklist</h2>
+    <ul class="checklist">
+        <li>Plugin hosted on reachable Git URL or uploaded as ZIP resource</li>
+        <li>Extensibility Configurations JSON pasted in Service Studio module properties</li>
+        <li>MABS version set to 10.0+ (via preference or LifeTime)</li>
+        <li><code class="il">PaymentApp</code> structure created with 5 attributes</li>
+        <li><code class="il">GetPaymentApps</code> client action created with JS node + JSONDeserialize + Assign</li>
+        <li>Screen calls <code class="il">GetPaymentApps</code> from OnReady and binds to List widget</li>
+        <li>iOS Distribution Certificate (<code class="il">.p12</code>) uploaded in LifeTime</li>
+        <li>Provisioning Profile (<code class="il">.mobileprovision</code>) uploaded in LifeTime</li>
+        <li>Bundle Identifier matches provisioning profile</li>
+        <li>iOS build generated successfully in MABS</li>
+        <li>Tested on real iPhone with at least one payment app installed</li>
+        <li>Tested Preview in Browser fallback (graceful error, no crash)</li>
+    </ul>
+</section>
+
+<div class="callout success">
+    <b>Done!</b>
+    Plugin is iOS-only. Once you push to Git and paste the Extensibility JSON in Service Studio, MABS handles the native compile. The key steps: host plugin &rarr; paste JSON &rarr; create structure + client action &rarr; upload certificates &rarr; build &rarr; test on real iPhone.
+</div>
+
+</div>
+
+<footer>
+    <p>InstalledApps Cordova Plugin &middot; Magenta Mobility &middot; MIT License</p>
+    <p>OutSystems 11 iOS Integration Guide &middot; iOS Only &middot; Generated <span id="stamp"></span></p>
+</footer>
+
+<script>
+    document.getElementById("stamp").textContent = new Date().toISOString().slice(0, 10);
+</script>
+
+</body>
+</html>

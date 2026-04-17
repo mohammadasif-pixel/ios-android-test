@@ -11,8 +11,8 @@ var InstalledApps = {
     },
 
     /**
-     * Get app info by package name (Android) or bundle ID (iOS)
-     * @param {String} packageName - Package name or bundle ID
+     * Get app info by bundle ID (iOS)
+     * @param {String} bundleId - Bundle ID
      * @param {Function} successCallback - Success callback with app info
      * @param {Function} errorCallback - Error callback
      */
@@ -22,7 +22,7 @@ var InstalledApps = {
 
     /**
      * Get list of installed payment apps only (UPI / wallets).
-     * Works on iOS, Android, and browser (mock).
+     * Works on iOS.
      * @param {Function} successCallback - Success callback with payment apps array
      * @param {Function} errorCallback - Error callback
      */

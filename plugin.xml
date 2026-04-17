@@ -1,51 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-plugin-installed-apps"
         version="1.0.0">
 
     <name>InstalledApps</name>
-    <description>Cordova plugin to detect installed apps (payment wallets / UPI / general) on Android and iOS.</description>
+    <description>Cordova plugin to detect installed payment apps (UPI / wallets) on iOS.</description>
     <license>MIT</license>
+    <author>Magenta Mobility</author>
+    <keywords>cordova,installed,apps,upi,payment,wallets,outsystems,ios</keywords>
+
+    <engines>
+        <engine name="cordova"     version=">=9.0.0" />
+        <engine name="cordova-ios" version=">=6.0.0" />
+    </engines>
 
     <js-module src="www/InstalledApps.js" name="InstalledApps">
         <clobbers target="cordova.plugins.InstalledApps" />
     </js-module>
-
-    <!-- android -->
-    <platform name="android">
-        <config-file target="res/xml/config.xml" parent="/*">
-            <feature name="InstalledApps">
-                <param name="android-package"
-                       value="com.plugin.installedapps.InstalledApps" />
-            </feature>
-        </config-file>
-        <config-file target="AndroidManifest.xml" parent="/*">
-            <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
-        </config-file>
-
-        <!-- Android 11+ package visibility. Declare payment + common apps
-             so getPackageInfo / getApplicationInfo can see them without
-             relying on QUERY_ALL_PACKAGES (which Play restricts). -->
-        <config-file target="AndroidManifest.xml" parent="/manifest">
-            <queries>
-                <package android:name="com.phonepe.app" />
-                <package android:name="com.google.android.apps.nbu.paisa.user" />
-                <package android:name="net.one97.paytm" />
-                <package android:name="in.org.npci.upiapp" />
-                <package android:name="in.amazon.mShop.android.shopping" />
-                <package android:name="com.whatsapp" />
-                <package android:name="com.dreamplug.androidapp" />
-                <package android:name="com.mobikwik_new" />
-                <package android:name="com.freecharge.android" />
-                <package android:name="com.myairtelapp" />
-                <package android:name="com.jio.jiopay" />
-            </queries>
-        </config-file>
-
-        <source-file src="src/android/InstalledApps.java"
-                     target-dir="src/com/plugin/installedapps" />
-    </platform>
 
     <!-- ios -->
     <platform name="ios">
@@ -79,18 +50,5 @@
 
         <header-file src="src/ios/InstalledApps.h" />
         <source-file src="src/ios/InstalledApps.m" />
-    </platform>
-
-    <!-- browser -->
-    <platform name="browser">
-        <config-file target="config.xml" parent="/*">
-            <feature name="InstalledApps">
-                <param name="browser-package" value="InstalledApps" />
-            </feature>
-        </config-file>
-
-        <js-module src="src/browser/InstalledAppsProxy.js" name="InstalledAppsProxy">
-            <runs />
-        </js-module>
     </platform>
 </plugin>

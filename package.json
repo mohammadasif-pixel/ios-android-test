@@ -1,23 +1,29 @@
 {
   "name": "cordova-plugin-installed-apps",
   "version": "1.0.0",
-  "description": "Applist Plugin (Android + iOS)",
+  "description": "Cordova plugin to detect installed payment apps (UPI / wallets) on iOS",
   "cordova": {
     "id": "cordova-plugin-installed-apps",
     "platforms": [
-      "android",
       "ios"
     ]
   },
+  "engines": {
+    "cordovaDependencies": {
+      "1.0.0": {
+        "cordova": ">=9.0.0",
+        "cordova-ios": ">=6.0.0"
+      }
+    }
+  },
   "keywords": [
     "ecosystem:cordova",
-    "cordova-android",
     "cordova-ios"
   ],
-  "author": "Applist",
+  "author": "Magenta Mobility",
   "license": "MIT",
   "files": [
-    "src",
+    "src/ios",
     "www",
     "plugin.xml",
     "package.json"
