@@ -205,7 +205,7 @@
                 btnPay.disabled = false;
                 console.log("App Initialized (Failsafe or DeviceReady)");
 
-                if (!(window.cordova && window.cordova.plugins && window.cordova.plugins.InstalledApps)) {
+                if (!(window.cordova && window.cordova.plugins && window.cordova.plugins.installedApps)) {
                     console.log("Injecting emergency browser mock...");
                     var PAY_MOCK = [
                         { appName: "Google Pay", packageName: "com.google.android.apps.nbu.paisa.user", urlScheme: "gpay",    icon: "https://cdn-icons-png.flaticon.com/512/6124/6124998.png" },
@@ -216,7 +216,7 @@
                     ];
                     window.cordova = window.cordova || {};
                     window.cordova.plugins = window.cordova.plugins || {};
-                    window.cordova.plugins.InstalledApps = {
+                    window.cordova.plugins.installedApps = {
                         getInstalledApps: function(success) { setTimeout(function(){ success(PAY_MOCK.slice()); }, 500); },
                         getPaymentApps:   function(success) { setTimeout(function(){ success(PAY_MOCK.slice()); }, 500); }
                     };
@@ -254,7 +254,7 @@
                 var listDiv = document.getElementById('appList');
                 listDiv.innerHTML = '<div class="loading-shimmer">Scanning device for matches...</div>';
                 btn.disabled = true;
-                var plugin = window.cordova && window.cordova.plugins && window.cordova.plugins.InstalledApps;
+                var plugin = window.cordova && window.cordova.plugins && window.cordova.plugins.installedApps;
                 if (!plugin || typeof plugin[method] !== 'function') {
                     btn.disabled = false;
                     listDiv.innerHTML = '<div class="main-card" style="color: #DA1E28;">Plugin method "' + method + '" missing in this environment.</div>';

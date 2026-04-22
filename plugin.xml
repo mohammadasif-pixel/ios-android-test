@@ -15,7 +15,7 @@
     </engines>
 
     <js-module src="www/InstalledApps.js" name="InstalledApps">
-        <clobbers target="cordova.plugins.InstalledApps" />
+        <clobbers target="cordova.plugins.installedApps" />
     </js-module>
 
     <!-- ios -->

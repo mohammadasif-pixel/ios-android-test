@@ -45,7 +45,7 @@ cordova plugin add ./path-to-plugin
 Returns installed payment/UPI apps from the built-in catalog.
 
 ```js
-cordova.plugins.InstalledApps.getPaymentApps(
+cordova.plugins.installedApps.getPaymentApps(
     function (apps) {
         console.log(apps);
     },
@@ -74,7 +74,7 @@ cordova.plugins.InstalledApps.getPaymentApps(
 Returns all apps whose URL scheme is declared in `LSApplicationQueriesSchemes`.
 
 ```js
-cordova.plugins.InstalledApps.getInstalledApps(
+cordova.plugins.installedApps.getInstalledApps(
     function (apps) { console.log(apps); },
     function (err) { console.error(err); }
 );
@@ -85,7 +85,7 @@ cordova.plugins.InstalledApps.getInstalledApps(
 Returns info for a single app. On iOS, limited to own app's bundle ID due to privacy restrictions.
 
 ```js
-cordova.plugins.InstalledApps.getAppInfo("com.example.myapp",
+cordova.plugins.installedApps.getAppInfo("com.example.myapp",
     function (info) { console.log(info); },
     function (err) { console.error(err); }
 );
@@ -130,13 +130,13 @@ Full step-by-step guide: **[outsystems-guide.html](outsystems-guide.html)**
 ```js
 var done = $resolve;
 
-if (!window.cordova || !cordova.plugins || !cordova.plugins.InstalledApps) {
+if (!window.cordova || !cordova.plugins || !cordova.plugins.installedApps) {
     $parameters.AppsJson = "[]";
     $parameters.ErrorMsg = "Plugin not available — run on a real device.";
     return done();
 }
 
-cordova.plugins.InstalledApps.getPaymentApps(
+cordova.plugins.installedApps.getPaymentApps(
     function (apps) {
         $parameters.AppsJson = JSON.stringify(apps || []);
         $parameters.ErrorMsg = "";

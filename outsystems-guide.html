@@ -451,13 +451,13 @@ src/
     <pre><code><span class="tag-kw">var</span> done = $resolve;   <span class="tag-cmt">// async pattern — MABS 10+ / ODC</span>
 
 <span class="tag-cmt">// Guard: plugin only exists on native device builds</span>
-<span class="tag-kw">if</span> (!window.cordova || !cordova.plugins || !cordova.plugins.InstalledApps) {
+<span class="tag-kw">if</span> (!window.cordova || !cordova.plugins || !cordova.plugins.installedApps) {
     $parameters.AppsJson = <span class="tag-str">"[]"</span>;
     $parameters.ErrorMsg = <span class="tag-str">"Plugin not available — run on a real device, not Preview in Browser."</span>;
     <span class="tag-kw">return</span> done();
 }
 
-cordova.plugins.InstalledApps.<span class="tag-fn">getPaymentApps</span>(
+cordova.plugins.installedApps.<span class="tag-fn">getPaymentApps</span>(
     <span class="tag-kw">function</span> (apps) {
         $parameters.AppsJson = <span class="tag-fn">JSON.stringify</span>(apps || []);
         $parameters.ErrorMsg = <span class="tag-str">""</span>;
@@ -486,13 +486,13 @@ cordova.plugins.InstalledApps.<span class="tag-fn">getPaymentApps</span>(
     <p><b>Step 2:</b> Use this JavaScript body:</p>
 
     <pre><code><span class="tag-cmt">// MABS 9 sync fallback</span>
-<span class="tag-kw">if</span> (!window.cordova || !cordova.plugins || !cordova.plugins.InstalledApps) {
+<span class="tag-kw">if</span> (!window.cordova || !cordova.plugins || !cordova.plugins.installedApps) {
     $parameters.AppsJson = <span class="tag-str">"[]"</span>;
     $parameters.ErrorMsg = <span class="tag-str">"Plugin not available."</span>;
     <span class="tag-kw">return</span>;
 }
 
-cordova.plugins.InstalledApps.<span class="tag-fn">getPaymentApps</span>(
+cordova.plugins.installedApps.<span class="tag-fn">getPaymentApps</span>(
     <span class="tag-kw">function</span> (apps) {
         $public.ClientVariables.CV_PaymentAppsJson = <span class="tag-fn">JSON.stringify</span>(apps || []);
         $public.ClientVariables.CV_PaymentAppsError = <span class="tag-str">""</span>;
@@ -673,7 +673,7 @@ whatsapp, cred, mobikwik, freecharge, airtel, jiopay</code></pre>
     <table>
         <tr><th style="width:40%">Symptom</th><th>Cause &amp; Fix</th></tr>
         <tr>
-            <td><code class="il">cordova.plugins.InstalledApps is undefined</code></td>
+            <td><code class="il">cordova.plugins.installedApps is undefined</code></td>
             <td>Running in <b>Preview in Browser</b>. Plugin is native-only. Deploy to real device. JS guard in Step 6 handles this gracefully.</td>
         </tr>
         <tr>
