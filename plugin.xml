@@ -22,7 +22,7 @@
         
         <config-file target="config.xml" parent="/*">
             <feature name="installedapps">
-                <param name="ios-package" value="InstalledApps" />
+                <param name="ios-package" value="InstalledApps" /> 
             </feature>
         </config-file>
 
