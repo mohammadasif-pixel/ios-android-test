@@ -4,30 +4,32 @@
         version="1.0.0">
 
     <name>InstalledApps</name>
-    <description>Cordova plugin to detect installed payment apps (UPI / wallets) on iOS.</description>
+    <description>Detect installed payment apps (UPI / wallets) on iOS & Android</description>
     <license>MIT</license>
     <author>Magenta Mobility</author>
-    <keywords>cordova,installed,apps,upi,payment,wallets,outsystems,ios</keywords>
+    <keywords>cordova,installed,apps,upi,payment,wallets,outsystems</keywords>
 
     <engines>
-        <engine name="cordova"     version=">=9.0.0" />
+        <engine name="cordova" version=">=9.0.0" />
         <engine name="cordova-ios" version=">=6.0.0" />
+        <engine name="cordova-android" version=">=10.0.0" />
     </engines>
+
+    <!-- JS -->
     <js-module src="www/InstalledApps.js" name="InstalledApps">
         <clobbers target="cordova.plugins.InstalledApps" />
     </js-module>
-    <!-- ios -->
+
+    <!-- ================= iOS ================= -->
     <platform name="ios">
 
-        
         <config-file target="config.xml" parent="/*">
             <feature name="InstalledApps">
-                <param name="ios-package" value="InstalledApps" /> 
+                <param name="ios-package" value="InstalledApps" />
             </feature>
         </config-file>
 
-        <!-- Declare URL schemes the app is allowed to query via canOpenURL:.
-             Payment schemes first, then general. Apple caps at 50 entries. -->
+        <!-- Allow checking installed apps via URL schemes -->
         <config-file target="*-Info.plist" parent="LSApplicationQueriesSchemes">
             <array>
                 <string>phonepe</string>
@@ -49,5 +51,48 @@
 
         <header-file src="src/ios/InstalledApps.h" />
         <source-file src="src/ios/InstalledApps.m" />
+
     </platform>
+
+    <!-- ================= Android ================= -->
+    <platform name="android">
+
+        <config-file target="config.xml" parent="/*">
+            <feature name="InstalledApps">
+                <param name="android-package" value="com.magenta.installedapps.InstalledApps" />
+            </feature>
+        </config-file>
+
+        <!-- Required for Android 11+ package visibility -->
+        <config-file target="AndroidManifest.xml" parent="/*">
+            <queries>
+
+                <!-- UPI Apps -->
+                <package android:name="com.phonepe.app" />
+                <package android:name="com.google.android.apps.nbu.paisa.user" />
+                <package android:name="net.one97.paytm" />
+                <package android:name="in.org.npci.upiapp" />
+                <package android:name="in.amazon.mShop.android.shopping" />
+                <package android:name="com.whatsapp" />
+                <package android:name="com.dreamplug.androidapp" />
+                <package android:name="com.mobikwik_new" />
+                <package android:name="com.freecharge.android" />
+                <package android:name="com.myairtelapp" />
+                <package android:name="com.jio.jiopay" />
+
+                <!-- Intent based (UPI intent detection fallback) -->
+                <intent>
+                    <action android:name="android.intent.action.VIEW" />
+                    <data android:scheme="upi" />
+                </intent>
+
+            </queries>
+        </config-file>
+
+        <!-- Java file -->
+        <source-file src="src/android/InstalledApps.java"
+                     target-dir="app/src/main/java/com/magenta/installedapps/" />
+
+    </platform>
+
 </plugin>
