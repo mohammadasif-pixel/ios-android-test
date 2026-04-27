@@ -14,14 +14,14 @@
         <engine name="cordova-ios" version=">=6.0.0" />
     </engines>
     <js-module src="www/InstalledApps.js" name="InstalledApps">
-        <clobbers target="InstalledApps" />
+        <clobbers target="cordova.plugins.InstalledApps" />
     </js-module>
     <!-- ios -->
     <platform name="ios">
 
         
         <config-file target="config.xml" parent="/*">
-            <feature name="installedapps">
+            <feature name="InstalledApps">
                 <param name="ios-package" value="InstalledApps" /> 
             </feature>
         </config-file>
